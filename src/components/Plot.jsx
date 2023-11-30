@@ -25,8 +25,11 @@ const Plot = ({ plot }) => {
     if (plot.dimension === 3) {
       console.log(plot);
       const trace = {
-        z: plot.zMatrix,
-        type: "surface",
+        x: plot.xValues,
+        y: plot.yValues,
+        z: plot.zValues,
+        type: "scatter3d",
+        mode: "markers",
       };
 
       layout.scene = {
@@ -40,9 +43,9 @@ const Plot = ({ plot }) => {
 
       layout.scene.camera = {
         eye: {
-          x: 1.25,
-          y: 1.25,
-          z: 0.5,
+          x: 1.5,
+          y: 1.5,
+          z: 1.5,
         },
         center: {
           x: 0,

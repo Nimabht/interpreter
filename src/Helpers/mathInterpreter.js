@@ -150,13 +150,11 @@ class MathInterpreter {
           let xValues = [];
           let yValues = [];
           let zValues = [];
-          let zMatrix = [];
+          // let zMatrix = [];
 
-          for (let i = scaleS; i < scaleE; i = i + 0.05) {
-            let row = [];
-            for (let j = scaleS; j < scaleE; j = j + 0.05) {
-              xValues.push(i);
-              yValues.push(j);
+          for (let i = scaleS; i < scaleE; i = i + 0.3) {
+            // let row = [];
+            for (let j = scaleS; j < scaleE; j = j + 0.3) {
               let temp = {};
               temp[variables[0]] = i;
               temp[variables[1]] = j;
@@ -170,20 +168,25 @@ class MathInterpreter {
               if (result.includes(",")) {
                 const answers = result.split(",");
                 for (const answer of answers) {
-                  row.push(mathjs.evaluate(answer));
+                  xValues.push(i);
+                  yValues.push(j);
+                  zValues.push(mathjs.evaluate(answer));
                 }
                 continue;
               }
-              row.push(mathjs.evaluate(result));
+
+              zValues.push(mathjs.evaluate(result));
+              xValues.push(i);
+              yValues.push(j);
             }
-            zMatrix.push(row);
+            // zMatrix.push(row);
           }
           return {
             dimension: 3,
             xValues,
             yValues,
             zValues,
-            zMatrix,
+            // zMatrix,
           };
         } else {
           return "Unsupported Equation for PLOT command!";
