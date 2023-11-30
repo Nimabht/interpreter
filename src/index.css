@@ -1,0 +1,35 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+.react-terminal-wrapper {
+  height: 100%;
+}
+
+::-webkit-scrollbar {
+  width: 4px;
+}
+
+/* Track */
+::-webkit-scrollbar-track {
+  background: #b8b8b8;
+}
+
+/* Handle */
+::-webkit-scrollbar-thumb {
+  background: #32e049;
+  border-radius: 5px;
+}
+
+/* Handle on hover */
+::-webkit-scrollbar-thumb:hover {
+  background: #b8b8b8;
+}
+
+#symbol {
+  display: none !important;
+}
+
+.modebar-btn--logo {
+  display: none !important;
+}
