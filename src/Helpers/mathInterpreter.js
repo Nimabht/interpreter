@@ -5,7 +5,7 @@ import * as mathjs from "mathjs";
 class MathInterpreter {
   constructor(initialEquations = {}) {
     this.equations = {
-      E1: "x^2+y^2=4",
+      E1: "x+y+z=0",
       ...initialEquations,
     };
   }
@@ -97,13 +97,20 @@ class MathInterpreter {
         const equation = this.equations[equationName];
         const variables = this.variablesOfEquation(equation);
         if (variables.length == 1) {
-          const xValue = +nerdamer
+          // const xValue = +nerdamer
+          //   .solve(equation.replace("=", "-(").concat(")"), variables[0])
+          //   .toString()
+          //   .replace("[", "")
+          //   .replace("]", "");
+          const result = nerdamer
             .solve(equation.replace("=", "-(").concat(")"), variables[0])
             .toString()
-            .replace("[", "")
-            .replace("]", "");
-          const xValues = Array(scaleE - scaleS).fill(xValue);
-          const yValues = range(scaleS, scaleE);
+            .replace(/\[|\]/g, "");
+
+          const xValue = mathjs.evaluate(result);
+
+          const xValues = Array((scaleE - scaleS) * 10).fill(xValue);
+          const yValues = range(scaleS, scaleE, 0.1);
           return {
             dimension: 2,
             xValues,
@@ -112,7 +119,7 @@ class MathInterpreter {
         } else if (variables.length == 2) {
           let xValues = [];
           let yValues = [];
-          for (let i = scaleS; i < scaleE; i = i + 0.02) {
+          for (let i = scaleS; i < scaleE; i = i + 0.05) {
             let temp = {};
             temp[variables[0]] = i;
             const result = nerdamer(equation.replace("=", "-(").concat(")"))
@@ -120,10 +127,11 @@ class MathInterpreter {
               .solveFor(variables[1])
               .toString();
 
+            if (result.includes("i")) continue;
+
             if (result.includes(",")) {
               const answers = result.split(",");
               for (const answer of answers) {
-                if (answer.includes("i")) continue;
                 yValues.push(mathjs.evaluate(answer));
                 xValues.push(i);
               }
@@ -144,26 +152,29 @@ class MathInterpreter {
           let zValues = [];
           let zMatrix = [];
 
-          for (let i = scaleS; i < scaleE; i = i + 1) {
+          for (let i = scaleS; i < scaleE; i = i + 0.05) {
             let row = [];
-            for (let j = scaleS; j < scaleE; j = j + 1) {
-              xValues.push(+i);
-              yValues.push(+j);
+            for (let j = scaleS; j < scaleE; j = j + 0.05) {
+              xValues.push(i);
+              yValues.push(j);
               let temp = {};
               temp[variables[0]] = i;
               temp[variables[1]] = j;
-              zValues.push(
-                +nerdamer(equation.replace("=", "-(").concat(")"))
-                  .evaluate(temp)
-                  .solveFor(variables[2])
-                  .toString(),
-              );
-              row.push(
-                +nerdamer(equation.replace("=", "-(").concat(")"))
-                  .evaluate(temp)
-                  .solveFor(variables[2])
-                  .toString(),
-              );
+              const result = nerdamer(equation.replace("=", "-(").concat(")"))
+                .evaluate(temp)
+                .solveFor(variables[2])
+                .toString();
+
+              if (result.includes("i")) continue;
+
+              if (result.includes(",")) {
+                const answers = result.split(",");
+                for (const answer of answers) {
+                  row.push(mathjs.evaluate(answer));
+                }
+                continue;
+              }
+              row.push(mathjs.evaluate(result));
             }
             zMatrix.push(row);
           }
