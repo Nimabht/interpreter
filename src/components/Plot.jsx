@@ -3,8 +3,6 @@ import { useEffect } from "react";
 
 const Plot = ({ plot }) => {
   useEffect(() => {
-    console.log(plot);
-
     const layout = {
       autosize: false,
       width: 500,
@@ -17,19 +15,24 @@ const Plot = ({ plot }) => {
         y: plot.yValues,
         type: "scatter",
         mode: "markers",
+        marker: {
+          size: 6,
+        },
       };
 
       Plotly.newPlot("plot", [trace], layout);
     }
 
     if (plot.dimension === 3) {
-      console.log(plot);
       const trace = {
         x: plot.xValues,
         y: plot.yValues,
         z: plot.zValues,
         type: "scatter3d",
         mode: "markers",
+        marker: {
+          size: 6,
+        },
       };
 
       layout.scene = {

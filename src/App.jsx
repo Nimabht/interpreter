@@ -1,16 +1,19 @@
 import { useState } from "react";
-import MathInterpreter from "./Helpers/mathInterpreter";
+import MathInterpreter from "./Helpers/Interpreter/mathInterpreter";
 import EquationTable from "./components/EquationTable";
 import Terminal, { ColorMode, TerminalOutput } from "react-terminal-ui";
 import Plot from "./components/Plot";
 
+const interpreter = new MathInterpreter();
+
 function App() {
   const [equations, setEquations] = useState({});
   const [plot, setPlot] = useState({});
+  const [solvationId, setSolvationId] = useState("");
   const [terminalLineData, setTerminalLineData] = useState([
     <TerminalOutput>Welcome to the Dragon Terminal!</TerminalOutput>,
   ]);
-  const handleExecute = (input) => {
+  const handleExecute = async (input) => {
     if (input === "") {
       setTerminalLineData((prev) => {
         return [...prev, <TerminalOutput>{`> ${input}`}</TerminalOutput>];
@@ -21,12 +24,36 @@ function App() {
       setTerminalLineData([]);
       return;
     }
-    const interpreter = new MathInterpreter(equations);
-    const result = interpreter.execute(input);
+    if (input.startsWith("PROVIDE")) {
+      const provider = input.split(" ").slice(1);
+      const inputt = `EXSOLVE ${solvationId} ${provider}`;
+      const result = await interpreter.execute(inputt);
+      setTerminalLineData((prev) => {
+        return [
+          ...prev,
+          <TerminalOutput>{`> ${input}`}</TerminalOutput>,
+          <TerminalOutput>{result}</TerminalOutput>,
+        ];
+      });
+      return;
+    }
+    // const interpreter = new MathInterpreter(equations);
+    const result = await interpreter.execute(input);
     if (!!result.dimension) {
       setPlot(result);
       setTerminalLineData((prev) => {
         return [...prev, <TerminalOutput>{`> ${input}`}</TerminalOutput>];
+      });
+      return;
+    }
+    if (!!result.solvationId) {
+      setSolvationId(result.solvationId);
+      setTerminalLineData((prev) => {
+        return [
+          ...prev,
+          <TerminalOutput>{`> ${input}`}</TerminalOutput>,
+          <TerminalOutput>{result.message}</TerminalOutput>,
+        ];
       });
       return;
     }
@@ -51,7 +78,7 @@ function App() {
           name="Dragon Terminal"
           prompt="🐉 >"
           colorMode={ColorMode.Dark}
-          onInput={(terminalInput) => handleExecute(terminalInput)}
+          onInput={async (terminalInput) => await handleExecute(terminalInput)}
         >
           {terminalLineData}
         </Terminal>
